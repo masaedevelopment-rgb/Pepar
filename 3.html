@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCC Test-3 (180 प्रश्न - 120 मिनट)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Noto+Sans+Devanagari:wght@400;700&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif; }
+body { background: linear-gradient(135deg, #667eea, #764ba2); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
+.container { width: 100%; max-width: 1350px; height: 95vh; background: white; border: 4px solid #764ba2; border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 15px 40px rgba(0,0,0,0.3); overflow: hidden; }
+.header { background: linear-gradient(to right, #764ba2, #667eea); color: white; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 22px; font-weight: bold; border-radius: 16px 16px 0 0; }
+.timer { font-size: 22px; font-weight: bold; background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 20px; }
+.main { flex: 1; display: flex; overflow: hidden; }
+.sidebar { width: 320px; background: #f8f9fa; border-right: 3px solid #764ba2; display: flex; flex-direction: column; }
+.sidebar-header { padding: 16px; text-align: center; background: #764ba2; color: white; font-weight: bold; font-size: 18px; }
+.question-list { flex: 1; overflow-y: auto; padding: 14px 10px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 8px; justify-items: center; }
+.q-item { width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; background: #fff; border: 2px solid #ddd; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; font-size: 16px; }
+.q-item:hover { background: #e9ecef; border-color: #764ba2; }
+.q-item.current { background: #764ba2; color: white; border-color: #764ba2; transform: scale(1.1); }
+.q-item.answered { background: #333; color: white; }
+.content { flex: 1; padding: 25px 40px; display: flex; flex-direction: column; justify-content: space-between; background: #fdfdfd; }
+.question-text { font-size: 18px; line-height: 1.7; margin-bottom: 25px; color: #333; }
+.options-list { margin-bottom: 30px; }
+.opt-item { padding: 16px 20px; margin: 12px 0; background: #f8f9fa; border: 2px solid #ddd; border-radius: 12px; font-size: 17px; cursor: pointer; transition: 0.3s; }
+.opt-item:hover { background: #e9ecef; border-color: #764ba2; }
+.opt-item.selected { background: #764ba2; color: white; border-color: #764ba2; }
+.next-btn { align-self: flex-end; padding: 16px 60px; font-size: 19px; background: #27ae60; color: white; border: none; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(39,174,96,0.4); }
+.next-btn:hover { background: #219a52; transform: translateY(-2px); }
+/* Login Screen */
+#login-screen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.97); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; border-radius: 20px; }
+#login-screen h2 { font-size: 32px; margin-bottom: 40px; color: #764ba2; }
+#login-screen input { width: 350px; padding: 18px; margin: 15px 0; font-size: 19px; border: 2px solid #764ba2; border-radius: 12px; }
+#login-screen button { padding: 18px 50px; font-size: 22px; background: #27ae60; color: white; border: none; border-radius: 12px; cursor: pointer; margin-top: 30px; box-shadow: 0 5px 15px rgba(39,174,96,0.4); }
+/* Results Page */
+.results-page { padding: 40px; background: linear-gradient(135deg, #f5f7fa, #c3cfe2); min-height: 100vh; }
+.results-page h2 { font-size: 32px; color: #764ba2; margin-bottom: 30px; text-align: center; }
+.results-table { width: 100%; max-width: 700px; margin: 0 auto 50px; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+.results-table th, .results-table td { padding: 18px; text-align: left; }
+.results-table th { background: #764ba2; color: white; font-size: 19px; }
+.results-table td { font-size: 18px; }
+.correct-row { background: #d5f5e3 !important; }
+.incorrect-row { background: #fadbd8 !important; }
+.review-btn, .print-btn { padding: 16px 50px; font-size: 20px; background: #2980b9; color: white; border: none; border-radius: 12px; cursor: pointer; margin-top: 40px; display: block; margin-left: auto; margin-right: auto; box-shadow: 0 5px 15px rgba(41,128,185,0.4); }
+.review-btn:hover, .print-btn:hover { background: #1f6391; }
+.review-section { margin-top: 60px; }
+.review-item { background: white; padding: 20px; margin: 20px auto; max-width: 800px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-left: 8px solid; }
+.review-correct { border-left-color: #27ae60; background: #d5f5e3; }
+.review-incorrect { border-left-color: #e74c3c; background: #fadbd8; }
+.review-skipped { border-left-color: #95a5a6; background: #ecf0f1; }
+.review-item strong { color: #333; }
+.user-answer { color: #e67e22; font-weight: bold; }
+.correct-answer { color: #27ae60; font-weight: bold; }
+.hide { display: none !important; }
+@media print { .no-print { display: none !important; } }
+@media (max-width: 1100px) { .sidebar { width: 280px; } }
+@media (max-width: 900px) { .main { flex-direction: column; } .sidebar { width: 100%; height: 240px; border-right: none; border-bottom: 3px solid #764ba2; } .question-list { grid-template-columns: repeat(8, 1fr); gap: 10px; padding: 15px; } .q-item { width: 50px; height: 50px; font-size: 15px; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Login Screen -->
+  <div id="login-screen">
+    <h2>अपनी जानकारी भरें</h2>
+    <input type="text" id="candidate-name" placeholder="अपना नाम लिखें">
+    <input type="text" id="candidate-roll" placeholder="रोल नंबर">
+    <button onclick="startQuiz()">क्विज़ शुरू करें</button>
+  </div>
+  <div class="header">
+    <div>CCC Test-3 (180 प्रश्न - 120 मिनट)</div>
+    <div class="timer" id="timer">120:00</div>
+  </div>
+  <div class="main">
+    <!-- Questions Panel -->
+    <div class="sidebar">
+      <div class="sidebar-header">Questions panel</div>
+      <div class="question-list" id="question-list"></div>
+    </div>
+    <!-- Main Content -->
+    <div class="content">
+      <div class="question-text" id="question"></div>
+      <div class="options-list" id="options"></div>
+      <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+</div>
+<script>
+// ==================== सभी प्रश्न (180) ====================
+let originalQuestions = [
+  // पुराने 120 प्रश्न (पिछले से)
+  { q: "कंप्यूटर क्या है?", a: "इलेक्ट्रॉनिक डेटा प्रोसेसिंग युक्ति", options: ["केवल कैलकुलेटर","टेलीविजन","खिलौना","इलेक्ट्रॉनिक डेटा प्रोसेसिंग युक्ति"] },
+  { q: "CPU का पूरा नाम?", a: "सेंट्रल प्रोसेसिंग यूनिट", options: ["कंप्यूटर पर्सनल यूनिट","सेंट्रल पावर यूनिट","कंट्रोल प्रोसेसिंग यूनिट","सेंट्रल प्रोसेसिंग यूनिट"] },
+  { q: "RAM का पूरा नाम?", a: "रैंडम एक्सेस मेमोरी", options: ["रीड ओनली मेमोरी","राइट एक्सेस मेमोरी","रन एक्सेस मेमोरी","रैंडम एक्सेस मेमोरी"] },
+  { q: "ROM का पूरा नाम?", a: "रीड ओनली मेमोरी", options: ["रैंडम ओनली मेमोरी","राइट ओनली मेमोरी","रजिस्टर ओनली मेमोरी","रीड ओनली मेमोरी"] },
+  { q: "RAM के मुख्य दो प्रकार?", a: "SRAM और DRAM", options: ["PROM और EPROM","EEPROM और Flash","ROM और Cache","SRAM और DRAM"] },
+  { q: "SRAM का पूरा नाम?", a: "स्टेटिक रैंडम एक्सेस मेमोरी", options: ["सिंक्रोनस रैंडम एक्सेस मेमोरी","सुपर रैंडम एक्सेस मेमोरी","सिंगल रैंडम एक्सेस मेमोरी","स्टेटिक रैंडम एक्सेस मेमोरी"] },
+  { q: "DRAM का पूरा नाम?", a: "डायनामिक रैंडम एक्सेस मेमोरी", options: ["डायरेक्ट रैंडम एक्सेस मेमोरी","डिजिटल रैंडम एक्सेस मेमोरी","डायोड रैंडम एक्सेस मेमोरी","डायनामिक रैंडम एक्सेस मेमोरी"] },
+  { q: "DDR का पूरा नाम?", a: "डबल डेटा रेट", options: ["डायरेक्ट डेटा रेट","डायनामिक डेटा रेट","डिजिटल डेटा रेट","डबल डेटा रेट"] },
+  { q: "ROM के मुख्य प्रकार?", a: "PROM, EPROM, EEPROM", options: ["SRAM, DRAM, SDRAM","Mask ROM, Flash, Cache","RAM, Cache, Register","PROM, EPROM, EEPROM"] },
+  { q: "PROM का पूरा नाम?", a: "प्रोग्रामेबल रीड ओनली मेमोरी", options: ["पर्मानेंट रीड ओनली मेमोरी","प्राइमरी रीड ओनली मेमोरी","पर्सनल रीड ओनली मेमोरी","प्रोग्रामेबल रीड ओनली मेमोरी"] },
+  { q: "EPROM को मिटाने का तरीका?", a: "अल्ट्रावायलेट प्रकाश", options: ["इलेक्ट्रिक करंट","हीट","मैग्नेट","अल्ट्रावायलेट प्रकाश"] },
+  { q: "EEPROM को मिटाने का तरीका?", a: "इलेक्ट्रिकली", options: ["UV लाइट","हीट","मैनुअली","इलेक्ट्रिकली"] },
+  { q: "फ्लैश मेमोरी किसका सब-टाइप है?", a: "EEPROM", options: ["EPROM","PROM","Mask ROM","EEPROM"] },
+  { q: "कंप्यूटर के मुख्य प्रकार?", a: "सुपर, मेनफ्रेम, मिनी, माइक्रो", options: ["डेस्कटॉप, लैपटॉप, टैबलेट, मोबाइल","Analog, Digital, Hybrid","कोई नहीं","सुपर, मेनफ्रेम, मिनी, माइक्रो"] },
+  { q: "सुपर कंप्यूटर का उपयोग?", a: "वैज्ञानिक गणना", options: ["गेमिंग","टाइपिंग","ऑफिस वर्क","वैज्ञानिक गणना"] },
+  { q: "पर्सनल कंप्यूटर किस श्रेणी में?", a: "माइक्रो कंप्यूटर", options: ["मिनी कंप्यूटर","मेनफ्रेम","सुपर कंप्यूटर","माइक्रो कंप्यूटर"] },
+  { q: "इनपुट डिवाइस उदाहरण?", a: "कीबोर्ड", options: ["मॉनिटर","प्रिंटर","स्पीकर","कीबोर्ड"] },
+  { q: "आउटपुट डिवाइस उदाहरण?", a: "मॉनिटर", options: ["कीबोर्ड","माउस","वेबकैम","मॉनिटर"] },
+  { q: "प्राइमरी मेमोरी उदाहरण?", a: "RAM", options: ["हार्ड डिस्क","पेन ड्राइव","सीडी","RAM"] },
+  { q: "सेकेंडरी मेमोरी उदाहरण?", a: "हार्ड डिस्क", options: ["RAM","कैश मेमोरी","रजिस्टर","हार्ड डिस्क"] },
+  { q: "सॉफ्टवेयर के दो मुख्य प्रकार?", a: "सिस्टम और एप्लीकेशन", options: ["हार्डवेयर और फर्मवेयर","इनपुट और आउटपुट","प्राइमरी और सेकेंडरी","सिस्टम और एप्लीकेशन"] },
+  { q: "ऑपरेटिंग सिस्टम किस प्रकार का सॉफ्टवेयर?", a: "सिस्टम सॉफ्टवेयर", options: ["एप्लीकेशन सॉफ्टवेयर","यूटिलिटी सॉफ्टवेयर","ड्राइवर सॉफ्टवेयर","सिस्टम सॉफ्टवेयर"] },
+  { q: "MS Word किस प्रकार का सॉफ्टवेयर?", a: "एप्लीकेशन सॉफ्टवेयर", options: ["सिस्टम सॉफ्टवेयर","ड्राइवर","फर्मवेयर","एप्लीकेशन सॉफ्टवेयर"] },
+  { q: "दुनिया का पहला इलेक्ट्रॉनिक कंप्यूटर?", a: "ENIAC", options: ["UNIVAC","EDVAC","EDSAC","ENIAC"] },
+  { q: "भारत का पहला कंप्यूटर?", a: "TIFRAC", options: ["PARAM","Siddhartha","HEC-2M","TIFRAC"] },
+  { q: "भारत का पहला सुपरकंप्यूटर?", a: "PARAM 8000", options: ["CRAY","FLOSOLVER","PACE","PARAM 8000"] },
+  { q: "पहली पीढ़ी की तकनीक?", a: "वैक्यूम ट्यूब", options: ["ट्रांजिस्टर","IC","माइक्रोप्रोसेसर","वैक्यूम ट्यूब"] },
+  { q: "दूसरी पीढ़ी की तकनीक?", a: "ट्रांजिस्टर", options: ["वैक्यूम ट्यूब","IC","LSI","ट्रांजिस्टर"] },
+  { q: "तीसरी पीढ़ी की तकनीक?", a: "इंटीग्रेटेड सर्किट", options: ["ट्रांजिस्टर","वैक्यूम ट्यूब","VLSI","इंटीग्रेटेड सर्किट"] },
+  { q: "चौथी पीढ़ी की तकनीक?", a: "माइक्रोप्रोसेसर", options: ["IC","ट्रांजिस्टर","वैक्यूम ट्यूब","माइक्रोप्रोसेसर"] },
+  { q: "पांचवीं पीढ़ी का आधार?", a: "कृत्रिम बुद्धिमत्ता", options: ["VLSI","ULSI","नैनोटेक्नोलॉजी","कृत्रिम बुद्धिमत्ता"] },
+  { q: "मेमोरी की सबसे छोटी इकाई?", a: "बिट", options: ["बाइट","KB","MB","बिट"] },
+  { q: "1 Byte = कितने Bit?", a: "8 Bit", options: ["4 Bit","16 Bit","32 Bit","8 Bit"] },
+  { q: "1 KB = कितने Byte?", a: "1024 Byte", options: ["1000 Byte","512 Byte","2048 Byte","1024 Byte"] },
+  { q: "1 MB = कितने KB?", a: "1024 KB", options: ["1000 KB","512 KB","2048 KB","1024 KB"] },
+  { q: "1 GB = कितने MB?", a: "1024 MB", options: ["1000 MB","512 MB","2048 MB","1024 MB"] },
+  { q: "ALU का पूरा नाम?", a: "Arithmetic Logic Unit", options: ["Address Logic Unit","Advanced Logic Unit","Application Logic Unit","Arithmetic Logic Unit"] },
+  { q: "CU का पूरा नाम?", a: "Control Unit", options: ["Central Unit","Calculate Unit","Computer Unit","Control Unit"] },
+  { q: "BIOS का पूरा नाम?", a: "Basic Input Output System", options: ["Binary Input Output System","Boot Input Output System","Basic Internet Operating System","Basic Input Output System"] },
+  { q: "USB का पूरा नाम?", a: "Universal Serial Bus", options: ["Universal Storage Bus","Unique Serial Bus","Universal System Bus","Universal Serial Bus"] },
+  { q: "LAN का पूरा नाम?", a: "Local Area Network", options: ["Large Area Network","Long Area Network","Link Area Network","Local Area Network"] },
+  { q: "WWW का पूरा नाम?", a: "World Wide Web", options: ["World Wide Wire","Web Wide World","World Web Wide","World Wide Web"] },
+  { q: "कंप्यूटर के पिता कौन हैं?", a: "चार्ल्स बैबेज", options: ["एलन ट्यूरिंग","बिल गेट्स","जॉन वॉन न्यूमन","चार्ल्स बैबेज"] },
+  { q: "Cache Memory कहाँ होती है?", a: "CPU और RAM के बीच", options: ["RAM और ROM के बीच","CPU और HDD के बीच","ROM और HDD के बीच","CPU और RAM के बीच"] },
+  { q: "SSD किस तकनीक पर आधारित है?", a: "Flash Memory", options: ["Magnetic Disk","Optical Disk","Tape","Flash Memory"] },
+  { q: "GUI का पूरा नाम?", a: "Graphical User Interface", options: ["General User Interface","Graphic User Interaction","Global User Interface","Graphical User Interface"] },
+  { q: "वर्चुअल मेमोरी क्या है?", a: "सेकेंडरी स्टोरेज का RAM की तरह उपयोग", options: ["RAM का बैकअप","ROM का एक्सटेंशन","कैश मेमोरी","सेकेंडरी स्टोरेज का RAM की तरह उपयोग"] },
+  { q: "फर्मवेयर क्या है?", a: "हार्डवेयर में एम्बेडेड सॉफ्टवेयर", options: ["ऑपरेटिंग सिस्टम","एप्लीकेशन सॉफ्टवेयर","ड्राइवर","हार्डवेयर में एम्बेडेड सॉफ्टवेयर"] },
+  { q: "HDD का पूरा नाम?", a: "हार्ड डिस्क ड्राइव", options: ["हाई डेफिनिशन डिस्क","हार्ड डेटा ड्राइव","हाई डेंसिटी डिस्क","हार्ड डिस्क ड्राइव"] },
+  { q: "SSD का पूरा नाम?", a: "सॉलिड स्टेट ड्राइव", options: ["सुपर स्पीड ड्राइव","सॉलिड स्टोरेज डिस्क","सिस्टम स्टेट ड्राइव","सॉलिड स्टेट ड्राइव"] },
+  { q: "CD का पूरा नाम?", a: "कॉम्पैक्ट डिस्क", options: ["कंप्यूटर डिस्क","कॉम्प्यूटर डेटा","कॉन्टिन्यूअस डिस्क","कॉम्पैक्ट डिस्क"] },
+  { q: "DVD का पूरा नाम?", a: "डिजिटल वर्सेटाइल डिस्क", options: ["डिजिटल वीडियो डिस्क","डायरेक्ट वीडियो डिस्क","डिजिटल वॉल्यूम डिस्क","डिजिटल वर्सेटाइल डिस्क"] },
+  { q: "कंप्यूटर जनरेशन में वैक्यूम ट्यूब किसमें?", a: "पहली पीढ़ी", options: ["दूसरी पीढ़ी","तीसरी पीढ़ी","चौथी पीढ़ी","पहली पीढ़ी"] },
+  { q: "भारतीय सुपर कंप्यूटर सीरीज?", a: "परम", options: ["क्रे","आईबीएम","एप्पल","परम"] },
+  { q: "ENIAC का पूरा नाम?", a: "इलेक्ट्रॉनिक न्यूमेरिकल इंटीग्रेटर एंड कंप्यूटर", options: ["इलेक्ट्रिकल न्यूमेरिकल इंटीग्रेटर","इलेक्ट्रॉनिक नेटवर्क इंटीग्रेटर","कोई नहीं","इलेक्ट्रॉनिक न्यूमेरिकल इंटीग्रेटर एंड कंप्यूटर"] },
+  { q: "यूटिलिटी सॉफ्टवेयर क्या है?", a: "सिस्टम मेंटेनेंस के लिए", options: ["गेमिंग के लिए","ऑफिस वर्क के लिए","इंटरनेट के लिए","सिस्टम मेंटेनेंस के लिए"] },
+  { q: "मेनफ्रेम कंप्यूटर का उपयोग?", a: "बड़े संगठनों में", options: ["घरेलू उपयोग में","मोबाइल में","खेल में","बड़े संगठनों में"] },
+  { q: "मिनी कंप्यूटर क्या है?", a: "मध्यम आकार का कंप्यूटर", options: ["बहुत छोटा","बहुत बड़ा","पोर्टेबल","मध्यम आकार का कंप्यूटर"] },
+  { q: "प्रोसेसिंग यूनिट क्या है?", a: "सीपीयू", options: ["रैम","रोम","एचडीडी","सीपीयू"] },
+  { q: "SDRAM का पूरा नाम?", a: "सिंक्रोनस डायनामिक रैंडम एक्सेस मेमोरी", options: ["सिंगल डायनामिक रैंडम एक्सेस मेमोरी","सुपर डायनामिक रैंडम एक्सेस मेमोरी","सेकेंडरी डायनामिक रैंडम एक्सेस मेमोरी","सिंक्रोनस डायनामिक रैंडम एक्सेस मेमोरी"] },
+  { q: "कंप्यूटर क्या है?", a: "एक इलेक्ट्रॉनिक डिवाइस जो डेटा प्रोसेस करता है", options: ["केवल गेम खेलने की डिवाइस","एक इलेक्ट्रॉनिक डिवाइस जो डेटा प्रोसेस करता है","प्रिंटर","एक मैकेनिकल मशीन"] },
+  { q: "What is a Computer?", a: "An electronic device that processes data", options: ["A television","A phone","An electronic device that processes data","A manual calculator"] },
+  { q: "प्रोग्राम की परिभाषा क्या है?", a: "निर्देशों का समूह जो कंप्यूटर को कार्य बताता है", options: ["मॉनिटर","हार्डवेयर का भाग","निर्देशों का समूह जो कंप्यूटर को कार्य बताता है","केवल गेम"] },
+  { q: "कंप्यूटर के मुख्य भाग कितने हैं?", a: "3 (Input, Processing, Output)", options: ["5","2","4","3 (Input, Processing, Output)"] },
+  { q: "हार्डवेयर क्या है?", a: "कंप्यूटर के भौतिक भाग", options: ["इंटरनेट","कंप्यूटर के भौतिक भाग","प्रोग्राम","सॉफ्टवेयर"] },
+  { q: "सॉफ्टवेयर क्या है?", a: "निर्देशों का समूह", options: ["कीबोर्ड","निर्देशों का समूह","भौतिक भाग","माउस"] },
+  { q: "कंप्यूटर के आविष्कारक कौन माने जाते हैं?", a: "चार्ल्स बैबेज", options: ["एलन ट्यूरिंग","स्टीव जॉब्स","चार्ल्स बैबेज","बिल गेट्स"] },
+  { q: "Who is known as the Father of Computer?", a: "Charles Babbage", options: ["Bill Gates","John von Neumann","Charles Babbage","Alan Turing"] },
+  { q: "कंप्यूटर की सबसे छोटी मेमोरी यूनिट क्या है?", a: "बिट", options: ["MB","बाइट","बिट","KB"] },
+  { q: "1 Byte कितने Bits के बराबर होता है?", a: "8", options: ["10","8","16","4"] },
+  { q: "मेमोरी यूनिट्स का सही क्रम क्या है (छोटे से बड़े)?", a: "Bit, Byte, KB, MB, GB, TB", options: ["MB, GB, TB","Byte, Bit, KB","Bit, Byte, KB, MB, GB, TB","TB, GB, MB, KB"] },
+  { q: "1 KB कितने Bytes के बराबर है?", a: "1024", options: ["2048","512","1024","1000"] },
+  { q: "1 GB कितने MB के बराबर है?", a: "1024", options: ["512","1024","2048","1000"] },
+  { q: "कंप्यूटर के मुख्य प्रकार कितने हैं?", a: "4 (Super, Mainframe, Mini, Micro)", options: ["3","4 (Super, Mainframe, Mini, Micro)","2","5"] },
+  { q: "पर्सनल कंप्यूटर किस प्रकार का है?", a: "Micro Computer", options: ["Mainframe","Super Computer","Micro Computer","Mini"] },
+  { q: "सुपर कंप्यूटर का उपयोग मुख्यतः क्या में होता है?", a: "वैज्ञानिक गणना और मौसम पूर्वानुमान", options: ["टाइपिंग","वैज्ञानिक गणना और मौसम पूर्वानुमान","घरेलू कार्य","गेमिंग"] },
+  { q: "हार्डवेयर के मुख्य प्रकार क्या हैं?", a: "Input, Output, Storage, Processing", options: ["केवल CPU","केवल RAM","Input, Output, Storage, Processing","केवल Software"] },
+  { q: "सॉफ्टवेयर के मुख्य प्रकार क्या हैं?", a: "System Software और Application Software", options: ["केवल Input","केवल Hardware","System Software और Application Software","केवल Games"] },
+  { q: "Operating System एक उदाहरण है?", a: "System Software", options: ["Hardware","Input Device","System Software","Application Software"] },
+  { q: "MS Word एक उदाहरण है?", a: "Application Software", options: ["Output Device","Hardware","Application Software","System Software"] },
+  { q: "पहली पीढ़ी के कंप्यूटर में क्या उपयोग होता था?", a: "Vacuum Tubes", options: ["Microprocessors","Transistors","ICs","Vacuum Tubes"] },
+  { q: "दूसरी पीढ़ी में मुख्य तकनीक क्या थी?", a: "Transistors", options: ["Vacuum Tubes","ICs","Transistors","AI"] },
+  { q: "तीसरी पीढ़ी में क्या उपयोग हुआ?", a: "Integrated Circuits (ICs)", options: ["Vacuum Tubes","Transistors","Integrated Circuits (ICs)","VLSI"] },
+  { q: "चौथी पीढ़ी में मुख्य कंपोनेंट क्या है?", a: "Microprocessors", options: ["Transistors","ICs","Microprocessors","Vacuum Tubes"] },
+  { q: "पांचवीं पीढ़ी आधारित है?", a: "Artificial Intelligence (AI)", options: ["ICs","Microprocessors","Artificial Intelligence (AI)","Vacuum Tubes"] },
+  { q: "ENIAC किस पीढ़ी का कंप्यूटर था?", a: "First", options: ["Fourth","Second","Third","First"] },
+  { q: "चौथी पीढ़ी से पर्सनल कंप्यूटर शुरू हुए?", a: "Yes", options: ["No","Yes"] },
+  { q: "कीबोर्ड एक क्या है?", a: "Input Device", options: ["Processing","Storage","Input Device","Output Device"] },
+  { q: "मॉनिटर क्या है?", a: "Output Device", options: ["Storage","Input","Output Device","None"] },
+  { q: "माउस किस प्रकार का डिवाइस है?", a: "Input", options: ["Storage","Both","Output","Input"] },
+  { q: "प्रिंटर मुख्यतः क्या है?", a: "Output Device", options: ["CPU","Storage","Input","Output Device"] },
+  { q: "स्कैनर क्या है?", a: "Input Device", options: ["None","Storage","Output","Input Device"] },
+  { q: "स्पीकर क्या है?", a: "Output Device", options: ["Processing","Input","Output Device","Storage"] },
+  { q: "वेबकैम किस प्रकार का है?", a: "Input", options: ["Storage","Both","Output","Input"] },
+  { q: "टचस्क्रीन क्या है?", a: "Both Input and Output", options: ["Storage","केवल Output","केवल Input","Both Input and Output"] },
+  { q: "जोystick मुख्यतः उपयोग होता है?", a: "Gaming (Input)", options: ["Storage","Printing","Gaming (Input)","Display"] },
+  { q: "प्लॉटर क्या है?", a: "Output Device (बड़े ड्रॉइंग के लिए)", options: ["CPU","Input","Storage","Output Device (बड़े ड्रॉइंग के लिए)"] },
+  { q: "माइक्रोफोन क्या है?", a: "Input Device", options: ["Output Device","Storage","Input Device","Processing"] },
+  { q: "प्रोजेक्टर क्या है?", a: "Output Device", options: ["Input","Storage","Output Device","CPU"] },
+  { q: "लाइट पेन क्या है?", a: "Input Device", options: ["Output","Input Device","Storage","None"] },
+  { q: "बारकोड रीडर एक क्या है?", a: "Input Device", options: ["Output","Input Device","Storage","Processing"] },
+  { q: "हेडफोन क्या है?", a: "Output Device", options: ["Input","Storage","Output Device","Both"] },
+  { q: "RAM क्या है?", a: "Random Access Memory (Volatile)", options: ["Permanent","Read Only","Random Access Memory (Volatile)","None"] },
+  { q: "ROM क्या है?", a: "Read Only Memory (Non-Volatile)", options: ["Input","Temporary","Volatile","Read Only Memory (Non-Volatile)"] },
+  { q: "PROM क्या है?", a: "Programmable ROM (एक बार प्रोग्राम)", options: ["RAM","Volatile","Erasable","Programmable ROM (एक बार प्रोग्राम)"] },
+  { q: "EPROM क्या है?", a: "Erasable Programmable ROM (UV Light से erase)", options: ["DRAM","EEPROM","PROM","Erasable Programmable ROM (UV Light से erase)"] },
+  { q: "EEPROM क्या है?", a: "Electrically Erasable Programmable ROM", options: ["PROM","EPROM","Electrically Erasable Programmable ROM","DRAM"] },
+  { q: "DRAM क्या है?", a: "Dynamic RAM (Refresh की जरूरत)", options: ["ROM","Permanent","Static","Dynamic RAM (Refresh की जरूरत)"] },
+  { q: "SRAM क्या है?", a: "Static RAM (Refresh नहीं, तेज)", options: ["Dynamic","ROM","Slow","Static RAM (Refresh नहीं, तेज)"] },
+  { q: "SDRAM क्या है?", a: "Synchronous DRAM", options: ["ROM","Static","Asynchronous","Synchronous DRAM"] },
+  { q: "DDR क्या है?", a: "Double Data Rate SDRAM", options: ["PROM","Static","Single","Double Data Rate SDRAM"] },
+  { q: "SRAM मुख्यतः उपयोग होता है?", a: "Cache Memory", options: ["ROM","Storage","Main Memory","Cache Memory"] },
+  { q: "HDD क्या है?", a: "Hard Disk Drive (Magnetic Storage)", options: ["RAM","Optical","Solid State","Hard Disk Drive (Magnetic Storage)"] },
+  { q: "SSD क्या है?", a: "Solid State Drive (Fast, No Moving Parts)", options: ["HDD","Optical","Magnetic","Solid State Drive (Fast, No Moving Parts)"] },
+  { q: "CD क्या है?", a: "Optical Storage", options: ["RAM","Flash","Magnetic","Optical Storage"] },
+  { q: "DVD क्या है?", a: "Optical (More Capacity than CD)", options: ["HDD","Flash","Magnetic","Optical (More Capacity than CD)"] },
+  { q: "Pen Drive क्या है?", a: "Flash Memory (USB)", options: ["ROM","Optical","Magnetic","Flash Memory (USB)"] },
+  { q: "CMOS क्या है?", a: "Battery Powered Memory for BIOS Settings", options: ["CPU","HDD","RAM","Battery Powered Memory for BIOS Settings"] },
+  { q: "VGA पोर्ट किसके लिए है?", a: "Video Output (Monitor)", options: ["USB","Audio","HDMI","Video Output (Monitor)"] },
+  { q: "HDMI पोर्ट क्या है?", a: "High Definition Multimedia Interface", options: ["USB","केवल Audio","केवल Video","High Definition Multimedia Interface"] },
+  { q: "SSD HDD से तेज क्यों है?", a: "No Moving Parts", options: ["Slow","Optical","Magnetic","No Moving Parts"] },
+  { q: "Pen Drive किस मेमोरी पर आधारित है?", a: "Flash", options: ["DRAM","Optical","Magnetic","Flash"] },
+  { q: "1 TB कितने GB के बराबर है?", a: "1024", options: ["2048","512","1000","1024"] },
+  { q: "Cache Memory मुख्यतः क्या है?", a: "SRAM", options: ["HDD","ROM","DRAM","SRAM"] },
+  { q: "USB पोर्ट मुख्यतः क्या के लिए है?", a: "Data Transfer और Peripheral", options: ["Video","Data Transfer और Peripheral","Audio Only","Power Only"] },
+  { q: "Motherboard का मुख्य कार्य क्या है?", a: "सभी कंपोनेंट्स को जोड़ना", options: ["Display","Storage","सभी कंपोनेंट्स को जोड़ना","Input Only"] },
+  { q: "CPU को क्या कहा जाता है?", a: "Brain of Computer", options: ["Brain of Computer","Memory","Storage","Output"] },
+  { q: "ALU का पूरा नाम क्या है?", a: "Arithmetic Logic Unit", options: ["Arithmetic Logic Unit","Access Logic Unit","Advanced Logic Unit","None"] },
+  { q: "Control Unit क्या करती है?", a: "निर्देशों को नियंत्रित करती है", options: ["Calculations","Storage","निर्देशों को नियंत्रित करती है","Input"] },
+  { q: "Register Memory कहाँ होती है?", a: "CPU के अंदर", options: ["HDD","CPU के अंदर","RAM","ROM"] },
+  { q: "Virtual Memory क्या है?", a: "HDD का भाग RAM की तरह उपयोग", options: ["HDD का भाग RAM की तरह उपयोग","Permanent","ROM","Cache"] },
+  { q: "Flash Memory Non-Volatile है?", a: "Yes", options: ["No","Yes"] },
+  { q: "Optical Storage में क्या उपयोग होता है?", a: "Laser", options: ["Magnet","Laser","Electricity Only","Mechanical Parts"] },
+  { q: "Magnetic Storage का उदाहरण है?", a: "HDD", options: ["CD","Pen Drive","HDD","SSD"] },
+  { q: "Solid State Storage में कोई Moving Part नहीं होता?", a: "Yes", options: ["No","Yes"] },
+  { q: "BIOS क्या है?", a: "Firmware in ROM", options: ["Application Software","Operating System","Firmware in ROM","Game"] },
+  { q: "Input Device का उदाहरण नहीं है?", a: "Monitor", options: ["Keyboard","Mouse","Monitor","Scanner"] },
+  { q: "Output Device का उदाहरण नहीं है?", a: "Keyboard", options: ["Printer","Speaker","Keyboard","Projector"] },
+  { q: "Storage Device का उदाहरण है?", a: "HDD", options: ["RAM","HDD","Monitor","Keyboard"] },
+  { q: "Volatile Memory का उदाहरण है?", a: "RAM", options: ["ROM","HDD","RAM","Pen Drive"] },
+  { q: "Non-Volatile Memory का उदाहरण है?", a: "ROM", options: ["RAM","DRAM","ROM","Cache"] },
+  { q: "Primary Memory है?", a: "RAM और ROM", options: ["HDD","SSD","RAM और ROM","Pen Drive"] },
+  { q: "Secondary Memory है?", a: "HDD", options: ["RAM","ROM","HDD","Cache"] },
+  { q: "DDR4 एक प्रकार है?", a: "RAM का", options: ["ROM","HDD","RAM का","CPU"] },
+  { q: "Motherboard पर CPU लगाने की जगह क्या कहलाती है?", a: "Socket", options: ["Socket","Port","Slot","Bus"] },
+  { q: "1 PB कितने TB के बराबर है?", a: "1024", options: ["1000","1024","512","2048"] },
+  { q: "कंप्यूटर डेटा को Binary में क्यों प्रोसेस करता है?", a: "आसान और विश्वसनीय", options: ["आसान और विश्वसनीय","कलरफुल","बड़ा","छोटा"] },
+  { q: "CPU के तीन मुख्य भाग हैं?", a: "ALU, CU, Registers", options: ["ALU, CU, Registers","RAM, ROM, HDD","Input, Output, Storage","Keyboard, Mouse, Monitor"] },
+  { q: "Bus क्या है?", a: "Data Transfer Path", options: ["Data Transfer Path","Storage","Input","Output"] },
+  { q: "System Software का उदाहरण नहीं है?", a: "MS Excel", options: ["Windows","Drivers","MS Excel","BIOS"] },
+  { q: "Application Software का उदाहरण नहीं है?", a: "Linux", options: ["Photoshop","Chrome","Linux","VLC"] },
+  { q: "Hybrid Computer का उदाहरण है?", a: "Analog + Digital", options: ["Digital Watch","Analog + Digital","Laptop","Supercomputer"] },
+  { q: "Analog Computer मुख्यतः उपयोग होता है?", a: "Scientific Measurements", options: ["Scientific Measurements","Gaming","Office Work","Internet"] },
+  { q: "Digital Computer आधारित है?", a: "Binary", options: ["Binary","Decimal","Analog","Mechanical"] },
+  { q: "Mainframe Computer उपयोग होता है?", a: "Large Organizations", options: ["Large Organizations","Personal","Gaming","Small Work"] },
+  { q: "Mini Computer को क्या कहा जाता था?", a: "Mid-range", options: ["Mid-range","Super","Micro","Analog"] },
+  { q: "Micro Computer है?", a: "PC, Laptop", options: ["PC, Laptop","Super","Mainframe","Mini"] },
+  { q: "Super Computer का उदाहरण है?", a: "PARAM", options: ["PARAM","Dell Laptop","Calculator","Smartphone"] },
+  { q: "Smartphone एक प्रकार का है?", a: "Micro Computer", options: ["Micro Computer","Mainframe","Super","Analog"] },
+  
+  // नए 60 MCQs
+  { q: "What is a computer? <br>कंप्यूटर क्या है?", a: "An electronic device that processes data | एक इलेक्ट्रॉनिक उपकरण जो डेटा प्रोसेस करता है", options: ["A mechanical tool for writing | लेखन के लिए एक यांत्रिक उपकरण","A type of vehicle | एक प्रकार का वाहन","A cooking appliance | एक रसोई उपकरण","An electronic device that processes data | एक इलेक्ट्रॉनिक उपकरण जो डेटा प्रोसेस करता है"] },
+  { q: "Who is known as the father of the computer? <br>कंप्यूटर के पिता के रूप में किसे जाना जाता है?", a: "Charles Babbage | चार्ल्स बैबेज", options: ["Bill Gates | बिल गेट्स","Steve Jobs | स्टीव जॉब्स","Alan Turing | एलन ट्यूरिंग","Charles Babbage | चार्ल्स बैबेज"] },
+  { q: "What does the term 'computer' derive from? <br>'कंप्यूटर' शब्द किससे निकला है?", a: "Compute, meaning to calculate | कंप्यूट, जिसका अर्थ गणना करना है", options: ["Compile, meaning to gather | कंपाइल, जिसका अर्थ इकट्ठा करना है","Communicate, meaning to talk | कम्युनिकेट, जिसका अर्थ बात करना है","Control, meaning to manage | कंट्रोल, जिसका अर्थ प्रबंधन करना है","Compute, meaning to calculate | कंप्यूट, जिसका अर्थ गणना करना है"] },
+  { q: "A computer is a machine that can be programmed to carry out sequences of what? <br>कंप्यूटर एक ऐसी मशीन है जो क्या करने के लिए प्रोग्राम की जा सकती है?", a: "Arithmetic or logical operations | अंकगणितीय या तार्किक ऑपरेशन्स", options: ["Physical labor | शारीरिक श्रम","Cooking recipes | खाना पकाने की रेसिपी","Driving instructions | ड्राइविंग निर्देश","Arithmetic or logical operations | अंकगणितीय या तार्किक ऑपरेशन्स"] },
+  { q: "What is the basic function of a computer? <br>कंप्यूटर का मूल कार्य क्या है?", a: "To input, process, output, and store data | डेटा इनपुट, प्रोसेस, आउटपुट और स्टोर करना", options: ["To print documents only | केवल दस्तावेज़ प्रिंट करना","To play music | संगीत बजाना","To make calls | कॉल करना","To input, process, output, and store data | डेटा इनपुट, प्रोसेस, आउटपुट और स्टोर करना"] },
+  { q: "Which generation of computers used vacuum tubes? <br>कंप्यूटर की किस पीढ़ी में वैक्यूम ट्यूब्स का उपयोग किया गया?", a: "First | पहली", options: ["Second | दूसरी","Third | तीसरी","Fourth | चौथी","First | पहली"] },
+  { q: "What technology defined the second generation of computers? <br>कंप्यूटर की दूसरी पीढ़ी को किस तकनीक ने परिभाषित किया?", a: "Transistors | ट्रांजिस्टर", options: ["Integrated Circuits | इंटीग्रेटेड सर्किट्स","Vacuum Tubes | वैक्यूम ट्यूब्स","Microprocessors | माइक्रोप्रोसेसर","Transistors | ट्रांजिस्टर"] },
+  { q: "Third generation computers were based on what? <br>तीसरी पीढ़ी के कंप्यूटर किस पर आधारित थे?", a: "Integrated Circuits | इंटीग्रेटेड सर्किट्स", options: ["Vacuum Tubes | वैक्यूम ट्यूब्स","Transistors | ट्रांजिस्टर","AI | एआई","Integrated Circuits | इंटीग्रेटेड सर्किट्स"] },
+  { q: "Which generation introduced microprocessors? <br>किस पीढ़ी में माइक्रोप्रोसेसर पेश किए गए?", a: "Fourth | चौथी", options: ["Fifth | पांचवी","First | पहली","Second | दूसरी","Fourth | चौथी"] },
+  { q: "Fifth generation computers focus on what? <br>पांचवी पीढ़ी के कंप्यूटर किस पर फोकस करते हैं?", a: "Artificial Intelligence | आर्टिफिशियल इंटेलिजेंस", options: ["Vacuum Tubes | वैक्यूम ट्यूब्स","Transistors | ट्रांजिस्टर","Integrated Circuits | इंटीग्रेटेड सर्किट्स","Artificial Intelligence | आर्टिफिशियल इंटेलिजेंस"] },
+  { q: "What years did the first generation of computers span? <br>कंप्यूटर की पहली पीढ़ी किन वर्षों में फैली?", a: "1940s-1950s | 1940s-1950s", options: ["1960s-1970s | 1960s-1970s","1980s-1990s | 1980s-1990s","2000s-present | 2000s-वर्तमान","1940s-1950s | 1940s-1950s"] },
+  { q: "Second generation computers were smaller due to what? <br>दूसरी पीढ़ी के कंप्यूटर किस कारण छोटे थे?", a: "Transistors | ट्रांजिस्टर", options: ["Vacuum Tubes | वैक्यूम ट्यूब्स","AI | एआई","Microprocessors | माइक्रोप्रोसेसर","Transistors | ट्रांजिस्टर"] },
+  { q: "What made third generation computers more efficient? <br>तीसरी पीढ़ी के कंप्यूटर को अधिक कुशल क्या बनाता था?", a: "Integrated Circuits | इंटीग्रेटेड सर्किट्स", options: ["Vacuum Tubes | वैक्यूम ट्यूब्स","Transistors | ट्रांजिस्टर","Superconductors | सुपरकंडक्टर","Integrated Circuits | इंटीग्रेटेड सर्किट्स"] },
+  { q: "Fourth generation computers are known for what? <br>चौथी पीढ़ी के कंप्यूटर किस लिए जाने जाते हैं?", a: "Personal computing | पर्सनल कंप्यूटिंग", options: ["Large size | बड़ा आकार","High heat | उच्च गर्मी","Slow speed | धीमी गति","Personal computing | पर्सनल कंप्यूटिंग"] },
+  { q: "Which generation uses parallel processing? <br>किस पीढ़ी में पैरेलल प्रोसेसिंग का उपयोग होता है?", a: "Fifth | पांचवी", options: ["First | पहली","Second | दूसरी","Third | तीसरी","Fifth | पांचवी"] },
+  { q: "What is a supercomputer? <br>सुपरकंप्यूटर क्या है?", a: "A very fast computer for complex calculations | जटिल गणनाओं के लिए बहुत तेज कंप्यूटर", options: ["A small personal device | छोटा पर्सनल डिवाइस","A laptop | लैपटॉप","A tablet | टैबलेट","A very fast computer for complex calculations | जटिल गणनाओं के लिए बहुत तेज कंप्यूटर"] },
+  { q: "Which type of computer is used in banks for large transactions? <br>बैंकों में बड़े लेनदेन के लिए किस प्रकार का कंप्यूटर उपयोग होता है?", a: "Mainframe | मेनफ्रेम", options: ["Microcomputer | माइक्रोकंप्यूटर","Laptop | लैपटॉप","Tablet | टैबलेट","Mainframe | मेनफ्रेम"] },
+  { q: "What is a minicomputer? <br>मिनीकंप्यूटर क्या है?", a: "Mid-sized computer for businesses | व्यवसायों के लिए मध्यम आकार का कंप्यूटर", options: ["Very large | बहुत बड़ा","Wearable | पहनने योग्य","Embedded | एम्बेडेड","Mid-sized computer for businesses | व्यवसायों के लिए मध्यम आकार का कंप्यूटर"] },
+  { q: "Personal computers fall under which category? <br>पर्सनल कंप्यूटर किस श्रेणी में आते हैं?", a: "Microcomputers | माइक्रोकंप्यूटर", options: ["Supercomputers | सुपरकंप्यूटर","Mainframes | मेनफ्रेम","Minicomputers | मिनीकंप्यूटर","Microcomputers | माइक्रोकंप्यूटर"] },
+  { q: "What is an analog computer? <br>एनालॉग कंप्यूटर क्या है?", a: "Processes continuous data | निरंतर डेटा प्रोसेस करता है", options: ["Digital only | केवल डिजिटल","Hybrid | हाइब्रिड","Quantum | क्वांटम","Processes continuous data | निरंतर डेटा प्रोसेस करता है"] },
+  { q: "Digital computers process what kind of data? <br>डिजिटल कंप्यूटर किस प्रकार का डेटा प्रोसेस करते हैं?", a: "Binary data | बाइनरी डेटा", options: ["Continuous | निरंतर","Analog | एनालॉग","Physical | भौतिक","Binary data | बाइनरी डेटा"] },
+  { q: "Hybrid computers combine which two types? <br>हाइब्रिड कंप्यूटर किन दो प्रकारों को जोड़ते हैं?", a: "Analog and Digital | एनालॉग और डिजिटल", options: ["Super and Mainframe | सुपर और मेनफ्रेम","Micro and Mini | माइक्रो और मिनी","Laptop and Desktop | लैपटॉप और डेस्कटॉप","Analog and Digital | एनालॉग और डिजिटल"] },
+  { q: "What is a workstation computer? <br>वर्कस्टेशन कंप्यूटर क्या है?", a: "High-performance for professionals | पेशेवरों के लिए उच्च प्रदर्शन", options: ["Low-cost personal | कम लागत वाला पर्सनल","Server | सर्वर","Embedded | एम्बेडेड","High-performance for professionals | पेशेवरों के लिए उच्च प्रदर्शन"] },
+  { q: "Wearable computers include what? <br>पहनने योग्य कंप्यूटर में क्या शामिल है?", a: "Smartwatches | स्मार्टवॉच", options: ["Mainframes | मेनफ्रेम","Supercomputers | सुपरकंप्यूटर","Minicomputers | मिनीकंप्यूटर","Smartwatches | स्मार्टवॉच"] },
+  { q: "Embedded computers are found in? <br>एम्बेडेड कंप्यूटर कहाँ पाए जाते हैं?", a: "Appliances like microwaves | माइक्रोवेव जैसे उपकरणों में", options: ["Desktops | डेस्कटॉप में","Laptops | लैपटॉप में","Tablets | टैबलेट में","Appliances like microwaves | माइक्रोवेव जैसे उपकरणों में"] },
+  { q: "What is the CPU in a computer? <br>कंप्यूटर में CPU क्या है?", a: "Central Processing Unit | सेंट्रल प्रोसेसिंग यूनिट", options: ["Control Power Unit | कंट्रोल पावर यूनिट","Computer Power Unit | कंप्यूटर पावर यूनिट","Central Power Utility | सेंट्रल पावर यूटिलिटी","Central Processing Unit | सेंट्रल प्रोसेसिंग यूनिट"] },
+  { q: "RAM stands for? <br>RAM का मतलब क्या है?", a: "Random Access Memory | रैंडम एक्सेस मेमोरी", options: ["Read Access Memory | रीड एक्सेस मेमोरी","Run Access Memory | रन एक्सेस मेमोरी","Real Access Memory | रियल एक्सेस मेमोरी","Random Access Memory | रैंडम एक्सेस मेमोरी"] },
+  { q: "What is the motherboard? <br>मदरबोर्ड क्या है?", a: "Main circuit board | मुख्य सर्किट बोर्ड", options: ["Power supply | पावर सप्लाई","Storage device | स्टोरेज डिवाइस","Display unit | डिस्प्ले यूनिट","Main circuit board | मुख्य सर्किट बोर्ड"] },
+  { q: "GPU means? <br>GPU का अर्थ क्या है?", a: "Graphics Processing Unit | ग्राफिक्स प्रोसेसिंग यूनिट", options: ["General Power Unit | जनरल पावर यूनिट","Game Processing Unit | गेम प्रोसेसिंग यूनिट","Global Processing Unit | ग्लोबल प्रोसेसिंग यूनिट","Graphics Processing Unit | ग्राफिक्स प्रोसेसिंग यूनिट"] },
+  { q: "What is HDD? <br>HDD क्या है?", a: "Hard Disk Drive | हार्ड डिस्क ड्राइव", options: ["High Definition Display | हाई डेफिनिशन डिस्प्ले","Hardware Data Device | हार्डवेयर डेटा डिवाइस","Home Desktop Drive | होम डेस्कटॉप ड्राइव","Hard Disk Drive | हार्ड डिस्क ड्राइव"] },
+  { q: "PSU stands for? <br>PSU का मतलब क्या है?", a: "Power Supply Unit | पावर सप्लाई यूनिट", options: ["Processing System Unit | प्रोसेसिंग सिस्टम यूनिट","Personal Storage Unit | पर्सनल स्टोरेज यूनिट","Printer Supply Unit | प्रिंटर सप्लाई यूनिट","Power Supply Unit | पावर सप्लाई यूनिट"] },
+  { q: "What is SSD? <br>SSD क्या है?", a: "Solid State Drive | सॉलिड स्टेट ड्राइव", options: ["Super Speed Device | सुपर स्पीड डिवाइस","System Storage Drive | सिस्टम स्टोरेज ड्राइव","Secure State Disk | सिक्योर स्टेट डिस्क","Solid State Drive | सॉलिड स्टेट ड्राइव"] },
+  { q: "What is the full form of ROM? <br>ROM का पूर्ण रूप क्या है?", a: "Read Only Memory | रीड ओनली मेमोरी", options: ["Random Only Memory | रैंडम ओनली मेमोरी","Run Only Memory | रन ओनली मेमोरी","Real Only Memory | रियल ओनली मेमोरी","Read Only Memory | रीड ओनली मेमोरी"] },
+  { q: "What is BIOS? <br>BIOS क्या है?", a: "Basic Input Output System | बेसिक इनपुट आउटपुट सिस्टम", options: ["Basic Internet Output System | बेसिक इंटरनेट आउटपुट सिस्टम","Binary Input Output System | बाइनरी इनपुट आउटपुट सिस्टम","Built In Output System | बिल्ट इन आउटपुट सिस्टम","Basic Input Output System | बेसिक इनपुट आउटपुट सिस्टम"] },
+  { q: "What is a keyboard? <br>कीबोर्ड क्या है?", a: "Input device | इनपुट डिवाइस", options: ["Output device | आउटपुट डिवाइस","Storage device | स्टोरेज डिवाइस","Processing device | प्रोसेसिंग डिवाइस","Input device | इनपुट डिवाइस"] },
+  { q: "What is a mouse? <br>माउस क्या है?", a: "Input device | इनपुट डिवाइस", options: ["Output device | आउटपुट डिवाइस","Storage | स्टोरेज","Processor | प्रोसेसर","Input device | इनपुट डिवाइस"] },
+  { q: "What is a monitor? <br>मॉनिटर क्या है?", a: "Output device | आउटपुट डिवाइस", options: ["Input device | इनपुट डिवाइस","Storage device | स्टोरेज डिवाइस","Control unit | कंट्रोल यूनिट","Output device | आउटपुट डिवाइस"] },
+  { q: "What is a printer? <br>प्रिंटर क्या है?", a: "Output device | आउटपुट डिवाइस", options: ["Input device | इनपुट डिवाइस","Processing unit | प्रोसेसिंग यूनिट","Memory | मेमोरी","Output device | आउटपुट डिवाइस"] },
+  { q: "What is a scanner? <br>स्कैनर क्या है?", a: "Input device | इनपुट डिवाइस", options: ["Output device | आउटपुट डिवाइस","Storage | स्टोरेज","Display | डिस्प्ले","Input device | इनपुट डिवाइस"] },
+  { q: "What is a speaker? <br>स्पीकर क्या है?", a: "Output device | आउटपुट डिवाइस", options: ["Input device | इनपुट डिवाइस","Processing | प्रोसेसिंग","Storage | स्टोरेज","Output device | आउटपुट डिवाइस"] },
+  { q: "Who is considered the founder of the first computer? <br>पहले कंप्यूटर के संस्थापक कौन माने जाते हैं?", a: "Charles Babbage | चार्ल्स बैबेज", options: ["Ada Lovelace | एडा लवलेस","Alan Turing | एलन ट्यूरिंग","John von Neumann | जॉन वॉन न्यूमैन","Charles Babbage | चार्ल्स बैबेज"] },
+  { q: "Who is known as the first programmer? <br>पहला प्रोग्रामर किसे कहा जाता है?", a: "Ada Lovelace | एडा लवलेस", options: ["Grace Hopper | ग्रेस हॉपर","Bill Gates | बिल गेट्स","Steve Jobs | स्टीव जॉब्स","Ada Lovelace | एडा लवलेस"] },
+  { q: "What was the name of the first electronic general-purpose digital computer? <br>पहले इलेक्ट्रॉनिक जनरल-परपज डिजिटल कंप्यूटर का नाम क्या था?", a: "ENIAC | ईएनआईएसी", options: ["UNIVAC | यूनिवैक","EDVAC | ईडीवीएसी","ABC | एबीसी","ENIAC | ईएनआईएसी"] },
+  { q: "Who developed ENIAC? <br>ईएनआईएसी किसने विकसित किया?", a: "John Mauchly and J. Presper Eckert | जॉन मॉक्ली और जे. प्रेस्पर एकर्ट", options: ["Charles Babbage | चार्ल्स बैबेज","Alan Turing | एलन ट्यूरिंग","Konrad Zuse | कोनराड ज्यूज","John Mauchly and J. Presper Eckert | जॉन मॉक्ली और जे. प्रेस्पर एकर्ट"] },
+  { q: "What is the name of India's first computer? <br>भारत का पहला कंप्यूटर का नाम क्या है?", a: "HEC-2M | एचईसी-2एम", options: ["TIFRAC | टीआईएफआरएसी","PARAM | पैराम","Anupam | अनुपम","HEC-2M | एचईसी-2एम"] },
+  { q: "When was India's first computer installed? <br>भारत का पहला कंप्यूटर कब स्थापित किया गया?", a: "1955 | 1955", options: ["1960 | 1960","1970 | 1970","1980 | 1980","1955 | 1955"] },
+  { q: "Where was India's first computer installed? <br>भारत का पहला कंप्यूटर कहाँ स्थापित किया गया?", a: "Indian Statistical Institute, Kolkata | इंडियन स्टैटिस्टिकल इंस्टीट्यूट, कोलकाता", options: ["IIT Delhi | आईआईटी दिल्ली","Tata Institute, Mumbai | टाटा इंस्टीट्यूट, मुंबई","CDAC Pune | सीडीएसी पुणे","Indian Statistical Institute, Kolkata | इंडियन स्टैटिस्टिकल इंस्टीट्यूट, कोलकाता"] },
+  { q: "What was India's first indigenously developed computer? <br>भारत का पहला स्वदेशी रूप से विकसित कंप्यूटर क्या था?", a: "TIFRAC | टीआईएफआरएसी", options: ["PARAM | पैराम","Anupam | अनुपम","HEC-2M | एचईसी-2एम","TIFRAC | टीआईएफआरएसी"] },
+  { q: "TIFRAC was developed by whom? <br>टीआईएफआरएसी किसने विकसित किया?", a: "Tata Institute of Fundamental Research | टाटा इंस्टीट्यूट ऑफ फंडामेंटल रिसर्च", options: ["CDAC | सीडीएसी","ISRO | इसरो","DRDO | डीआरडीओ","Tata Institute of Fundamental Research | टाटा इंस्टीट्यूट ऑफ फंडामेंटल रिसर्च"] },
+  { q: "When was TIFRAC developed? <br>टीआईएफआरएसी कब विकसित किया गया?", a: "1956-1960 | 1956-1960", options: ["1960-1965 | 1960-1965","1970-1975 | 1970-1975","1980-1985 | 1980-1985","1956-1960 | 1956-1960"] },
+  { q: "What does ALU stand for? <br>ALU का पूर्ण रूप क्या है?", a: "Arithmetic Logic Unit | अंकगणितीय तर्क इकाई", options: ["Advanced Logic Unit | एडवांस्ड लॉजिक यूनिट","Arithmetic Learning Unit | अंकगणितीय लर्निंग यूनिट","Automatic Logic Unit | ऑटोमैटिक लॉजिक यूनिट","Arithmetic Logic Unit | अंकगणितीय तर्क इकाई"] },
+  { q: "What does CU stand for in computer? <br>कंप्यूटर में CU का मतलब क्या है?", a: "Control Unit | कंट्रोल यूनिट", options: ["Central Unit | सेंट्रल यूनिट","Computer Unit | कंप्यूटर यूनिट","Control Utility | कंट्रोल यूटिलिटी","Control Unit | कंट्रोल यूनिट"] },
+  { q: "What is Cache memory? <br>कैश मेमोरी क्या है?", a: "Fast memory between CPU and RAM | CPU और RAM के बीच तेज मेमोरी", options: ["Slow memory | धीमी मेमोरी","External storage | बाहरी स्टोरेज","Input device | इनपुट डिवाइस","Fast memory between CPU and RAM | CPU और RAM के बीच तेज मेमोरी"] },
+  { q: "What is an operating system? <br>ऑपरेटिंग सिस्टम क्या है?", a: "Software that manages hardware and software | हार्डवेयर और सॉफ्टवेयर को मैनेज करने वाला सॉफ्टवेयर", options: ["Hardware | हार्डवेयर","Input device | इनपुट डिवाइस","Output device | आउटपुट डिवाइस","Software that manages hardware and software | हार्डवेयर और सॉफ्टवेयर को मैनेज करने वाला सॉफ्टवेयर"] },
+  { q: "Which is an example of input device? <br>इनपुट डिवाइस का उदाहरण कौन सा है?", a: "Joystick | जॉयस्टिक", options: ["Printer | प्रिंटर","Monitor | मॉनिटर","Speaker | स्पीकर","Joystick | जॉयस्टिक"] },
+  { q: "Which is an example of output device? <br>आउटपुट डिवाइस का उदाहरण कौन सा है?", a: "Plotter | प्लॉटर", options: ["Mouse | माउस","Keyboard | कीबोर्ड","Scanner | स्कैनर","Plotter | प्लॉटर"] },
+];
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+let questions = originalQuestions.map(item => {
+  let opts = [...item.options];
+  shuffleArray(opts);
+  return { q: item.q, a: item.a, options: opts };
+});
+let currentQuestion = 0;
+let answers = new Array(questions.length).fill(null);
+let totalTime = 120 * 60; // 120 मिनट
+let timerInterval;
+let candidateName = '';
+let candidateRoll = '';
+function formatTime(sec) {
+  let m = String(Math.floor(sec / 60)).padStart(2, '0');
+  let s = String(sec % 60).padStart(2, '0');
+  return `${m}:${s}`;
+}
+function startTimer() {
+  document.getElementById('timer').innerText = formatTime(totalTime);
+  timerInterval = setInterval(() => {
+    totalTime--;
+    document.getElementById('timer').innerText = formatTime(totalTime);
+    if (totalTime <= 0) {
+      clearInterval(timerInterval);
+      endQuiz();
+    }
+  }, 1000);
+}
+function buildQuestionList() {
+  const list = document.getElementById('question-list');
+  list.innerHTML = '';
+  for (let i = 0; i < questions.length; i++) {
+    const div = document.createElement('div');
+    div.className = 'q-item';
+    if (i === currentQuestion) div.classList.add('current');
+    if (answers[i] !== null) div.classList.add('answered');
+    div.innerText = i + 1;
+    div.onclick = () => gotoQuestion(i);
+    list.appendChild(div);
+  }
+}
+function loadQuestion() {
+  const q = questions[currentQuestion];
+  document.getElementById('question').innerHTML = q.q;
+  const optsDiv = document.getElementById('options');
+  optsDiv.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'opt-item';
+    div.innerHTML = `${String.fromCharCode(65 + i)}. ${opt}`;
+    if (answers[currentQuestion] === i) div.classList.add('selected');
+    div.onclick = () => {
+      answers[currentQuestion] = i;
+      loadQuestion();
+      buildQuestionList();
+    };
+    optsDiv.appendChild(div);
+  });
+  const nextBtn = document.getElementById('next-btn');
+  if (currentQuestion === questions.length - 1) {
+    nextBtn.innerText = 'Submit';
+    nextBtn.onclick = endQuiz;
+  } else {
+    nextBtn.innerText = 'Next';
+    nextBtn.onclick = nextQuestion;
+  }
+  buildQuestionList();
+}
+function nextQuestion() {
+  if (currentQuestion < questions.length - 1) {
+    currentQuestion++;
+    loadQuestion();
+  }
+}
+function gotoQuestion(idx) {
+  currentQuestion = idx;
+  loadQuestion();
+}
+function startQuiz() {
+  candidateName = document.getElementById('candidate-name').value.trim();
+  candidateRoll = document.getElementById('candidate-roll').value.trim();
+  if (!candidateName || !candidateRoll) {
+    alert('कृपया नाम और रोल नंबर भरें!');
+    return;
+  }
+  document.getElementById('login-screen').classList.add('hide');
+  buildQuestionList();
+  loadQuestion();
+  startTimer();
+}
+function endQuiz() {
+  clearInterval(timerInterval);
+  let totalQuestions = questions.length;
+  let attempted = answers.filter(ans => ans !== null).length;
+  let skipped = totalQuestions - attempted;
+  let correct = 0;
+  let wrong = 0;
+  answers.forEach((ans, i) => {
+    if (ans !== null) {
+      if (questions[i].options[ans] === questions[i].a) correct++;
+      else wrong++;
+    }
+  });
+  let score = correct;
+  let percentage = ((score / totalQuestions) * 100).toFixed(2);
+  let resultsWindow = window.open('', '_blank');
+  let reviewHTML = '';
+  questions.forEach((q, i) => {
+    let statusClass = '';
+    let userAns = 'छोड़ा गया';
+    let userAnsClass = '';
+    if (answers[i] !== null) {
+      userAns = q.options[answers[i]];
+      userAnsClass = 'user-answer';
+      if (q.options[answers[i]] === q.a) {
+        statusClass = 'review-correct';
+      } else {
+        statusClass = 'review-incorrect';
+      }
+    } else {
+      statusClass = 'review-skipped';
+    }
+    reviewHTML += `
+      <div class="review-item ${statusClass}">
+        <strong>प्रश्न ${i+1}:</strong> ${q.q}<br><br>
+        <strong>आपका जवाब:</strong> <span class="${userAnsClass}">${userAns}</span><br>
+        <strong>सही जवाब:</strong> <span class="correct-answer">${q.a}</span>
+      </div>
+    `;
+  });
+  resultsWindow.document.write(`
+    <html>
+    <head>
+      <title>CCC Exam Result</title>
+      <style>
+        body { background: linear-gradient(135deg, #f5f7fa, #c3cfe2); padding: 40px; font-family: 'Noto Sans Devanagari', sans-serif; }
+        h2 { font-size: 32px; color: #764ba2; text-align: center; margin-bottom: 40px; }
+        table { width: 100%; max-width: 700px; margin: 0 auto 50px; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        th, td { padding: 18px; text-align: left; }
+        th { background: #764ba2; color: white; font-size: 19px; }
+        td { font-size: 18px; }
+        .correct-row { background: #d5f5e3; }
+        .incorrect-row { background: #fadbd8; }
+        .review-btn, .print-btn { padding: 16px 50px; font-size: 20px; background: #2980b9; color: white; border: none; border-radius: 12px; cursor: pointer; display: block; margin: 40px auto; box-shadow: 0 5px 15px rgba(41,128,185,0.4); }
+        .review-btn:hover, .print-btn:hover { background: #1f6391; }
+        .review-section { margin-top: 60px; }
+        .review-item { background: white; padding: 20px; margin: 20px auto; max-width: 800px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-left: 8px solid; }
+        .review-correct { border-left-color: #27ae60; background: #d5f5e3; }
+        .review-incorrect { border-left-color: #e74c3c; background: #fadbd8; }
+        .review-skipped { border-left-color: #95a5a6; background: #ecf0f1; }
+        .user-answer { color: #e67e22; font-weight: bold; }
+        .correct-answer { color: #27ae60; font-weight: bold; }
+        @media print { .no-print { display: none !important; } }
+      </style>
+    </head>
+    <body>
+      <h2>CCC Exam Result</h2>
+      <table>
+        <tr><th>नाम:</th><td>${candidateName}</td></tr>
+        <tr><th>रोल नंबर:</th><td>${candidateRoll}</td></tr>
+        <tr><th>कोर्स नाम:</th><td>CCC Test-3</td></tr>
+        <tr><th>कुल प्रश्न:</th><td>${totalQuestions}</td></tr>
+        <tr><th>अटेम्प्ट किए:</th><td>${attempted}</td></tr>
+        <tr><th>छोड़े गए:</th><td>${skipped}</td></tr>
+        <tr class="correct-row"><th>सही उत्तर:</th><td>${correct}</td></tr>
+        <tr class="incorrect-row"><th>गलत उत्तर:</th><td>${wrong}</td></tr>
+        <tr><th>कुल स्कोर:</th><td>${score}</td></tr>
+        <tr><th>परसेंटेज:</th><td>${percentage}%</td></tr>
+      </table>
+      <button class="review-btn no-print" onclick="document.getElementById('review-section').style.display='block'; this.style.display='none';">Questions Review</button>
+      <div id="review-section" style="display:none;" class="review-section">
+        ${reviewHTML}
+        <button class="print-btn no-print" onclick="window.print()">प्रिंट / PDF करें</button>
+      </div>
+    </body>
+    </html>
+  `);
+  resultsWindow.document.close();
+}
+</script>
+</body>
+</html>
